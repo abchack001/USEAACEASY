@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>兒童專屬 AAC 語音溝通板</title>
+  <title>兒童 AAC 語音溝通板</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: #f1f5f9; padding: 10px; text-align: center; user-select: none; }
@@ -22,7 +22,7 @@
     /* 大圖示分類標題按鈕區 */
     .category-scroll {
       display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px;
-      margin-bottom: 10px; scrollbar-width: none;
+      margin-bottom: 12px; scrollbar-width: none;
     }
     .category-scroll::-webkit-scrollbar { display: none; }
     
@@ -67,7 +67,7 @@
     .card-icon { font-size: 44px; margin-bottom: 4px; }
     .card-label { font-size: 20px; font-weight: 800; color: #0f172a; }
 
-    /* 類別配色 */
+    /* 各類別邊框色彩 */
     .cat-core { border-color: #f97316; background-color: #fff7ed; }
     .cat-food { border-color: #22c55e; background-color: #f0fdf4; }
     .cat-actions { border-color: #06b6d4; background-color: #ecfeff; }
@@ -89,192 +89,10 @@
     </div>
   </div>
 
-  <!-- 分類選單 -->
+  <!-- 分類標題按鈕區 -->
   <div class="category-scroll" id="categoryBar"></div>
 
-  <!-- 圖卡網格 -->
-  <div class="card-grid" id="cardGrid"></div>
-
-  <script>
-    const categories = [
-      { id: "all", name: "全部", icon: "🌈" },
-      { id: "core", name: "常用需求", icon: "⭐" },
-      { id: "food", name: "飲食零食", icon: "🍎" },
-      { id: "actions", name: "常用動作", icon: "🏃" },
-      { id: "places", name: "常去地點", icon: "🏠" },
-      { id: "people", name: "人物稱呼", icon: "👨‍👩‍👧" },
-      { id: "body", name: "身體部位", icon: "✋" },
-      { id: "feelings", name: "感覺心情", icon: "❤️" }
-    ];
-
-    const cards = [
-      // 常用需求 (包含尿尿、便便)
-      { cat: "core", text: "我想要", icon: "🙋‍♂️", cls: "cat-core" },
-      { cat: "core", text: "要", icon: "⭕", cls: "cat-core" },
-      { cat: "core", text: "不要", icon: "❌", cls: "cat-core" },
-      { cat: "core", text: "尿尿", icon: "🚽", cls: "cat-core" },
-      { cat: "core", text: "便便", icon: "💩", cls: "cat-core" },
-      { cat: "core", text: "幫忙", icon: "🤝", cls: "cat-core" },
-      { cat: "core", text: "洗手", icon: "🧼", cls: "cat-core" },
-      { cat: "core", text: "喝水", icon: "🥛", cls: "cat-core" },
-      { cat: "core", text: "抱抱", icon: "🫂", cls: "cat-core" },
-      { cat: "core", text: "好", icon: "👍", cls: "cat-core" },
-      { cat: "core", text: "不好", icon: "👎", cls: "cat-core" },
-
-      // 飲食零食 (15種水果 + 10種零食點心)
-      { cat: "food", text: "西瓜", icon: "🍉", cls: "cat-food" },
-      { cat: "food", text: "木瓜", icon: "🥭", cls: "cat-food" },
-      { cat: "food", text: "鳳梨", icon: "🍍", cls: "cat-food" },
-      { cat: "food", text: "奇異果", icon: "🥝", cls: "cat-food" },
-      { cat: "food", text: "草莓", icon: "🍓", cls: "cat-food" },
-      { cat: "food", text: "葡萄", icon: "🍇", cls: "cat-food" },
-      { cat: "food", text: "蘋果", icon: "🍎", cls: "cat-food" },
-      { cat: "food", text: "香蕉", icon: "🍌", cls: "cat-food" },
-      { cat: "food", text: "橘子", icon: "🍊", cls: "cat-food" },
-      { cat: "food", text: "芭樂", icon: "🍏", cls: "cat-food" },
-      { cat: "food", text: "櫻桃", icon: "🍒", cls: "cat-food" },
-      { cat: "food", text: "檸檬", icon: "🍋", cls: "cat-food" },
-      { cat: "food", text: "水蜜桃", icon: "🍑", cls: "cat-food" },
-      { cat: "food", text: "哈密瓜", icon: "🍈", cls: "cat-food" },
-      { cat: "food", text: "藍莓", icon: "🫐", cls: "cat-food" },
-      { cat: "food", text: "餅乾", icon: "🍪", cls: "cat-food" },
-      { cat: "food", text: "優格", icon: "🥛", cls: "cat-food" },
-      { cat: "food", text: "果凍", icon: "🍮", cls: "cat-food" },
-      { cat: "food", text: "布丁", icon: "🍮", cls: "cat-food" },
-      { cat: "food", text: "蛋糕", icon: "🍰", cls: "cat-food" },
-      { cat: "food", text: "冰淇淋", icon: "🍦", cls: "cat-food" },
-      { cat: "food", text: "糖果", icon: "🍬", cls: "cat-food" },
-      { cat: "food", text: "薯條", icon: "🍟", cls: "cat-food" },
-      { cat: "food", text: "麵包", icon: "🍞", cls: "cat-food" },
-      { cat: "food", text: "巧克力", icon: "🍫", cls: "cat-food" },
-      { cat: "food", text: "吃飯", icon: "🍚", cls: "cat-food" },
-      { cat: "food", text: "吃麵", icon: "🍜", cls: "cat-food" },
-
-      // 常用動作
-      { cat: "actions", text: "玩玩具", icon: "🧸", cls: "cat-actions" },
-      { cat: "actions", text: "看電視", icon: "📺", cls: "cat-actions" },
-      { cat: "actions", text: "肚子餓", icon: "🤤", cls: "cat-actions" },
-      { cat: "actions", text: "想睡覺", icon: "🛌", cls: "cat-actions" },
-      { cat: "actions", text: "想出去玩", icon: "🛝", cls: "cat-actions" },
-      { cat: "actions", text: "洗澡", icon: "🛁", cls: "cat-actions" },
-      { cat: "actions", text: "聽音樂", icon: "🎵", cls: "cat-actions" },
-      { cat: "actions", text: "散步", icon: "🚶", cls: "cat-actions" },
-      { cat: "actions", text: "刷牙", icon: "🪥", cls: "cat-actions" },
-      { cat: "actions", text: "坐下", icon: "🪑", cls: "cat-actions" },
-
-      // 常去地點 (15個)
-      { cat: "places", text: "家", icon: "🏠", cls: "cat-places" },
-      { cat: "places", text: "學校", icon: "🏫", cls: "cat-places" },
-      { cat: "places", text: "教室", icon: "🚪", cls: "cat-places" },
-      { cat: "places", text: "公園", icon: "🛝", cls: "cat-places" },
-      { cat: "places", text: "醫院", icon: "🏥", cls: "cat-places" },
-      { cat: "places", text: "全聯", icon: "🛒", cls: "cat-places" },
-非常抱歉！上一版的程式碼因為資料較多，長度過長導致輸出中斷。
-
-這次我採用了**精簡高效的資料結構**，確保程式碼一次完整提供、不會中斷，並能100% 正常顯示所有 **88 張圖卡**與**放大版分類選單**！
-
----
-
-### 📱 兒童專屬 AAC 語音溝通網頁（完整修復版）
-
-請複製以下框內的**完整 HTML 程式碼**，另存為 `.html` 檔案（例如：`aac_child.html`），傳至 iPad 或手機開啟即可使用，**完全不需連網**：
-
-```html
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>兒童 AAC 語音溝通板</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #f1f5f9; padding: 10px; text-align: center; user-select: none; }
-
-    /* 頂部固定的句子組合區 */
-    .sticky-header { position: sticky; top: 0; z-index: 100; background-color: #f1f5f9; padding-bottom: 8px; }
-    .sentence-box {
-      background: #ffffff; border: 4px solid #3b82f6; border-radius: 20px;
-      padding: 10px 14px; min-height: 72px; display: flex; align-items: center;
-      justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
-    .sentence-text { font-size: 26px; font-weight: bold; color: #1e293b; flex-grow: 1; text-align: left; }
-    .btn-speech { background-color: #22c55e; color: white; border: none; padding: 10px 16px; font-size: 18px; font-weight: bold; border-radius: 14px; cursor: pointer; }
-    .btn-clear { background-color: #ef4444; color: white; border: none; padding: 10px 14px; font-size: 18px; font-weight: bold; border-radius: 14px; cursor: pointer; margin-left: 6px; }
-
-    /* 大圖示分類選單 */
-    .category-scroll {
-      display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px;
-      margin-bottom: 12px; scrollbar-width: none;
-    }
-    .category-scroll::-webkit-scrollbar { display: none; }
-    
-    .tab-item {
-      flex: 0 0 auto; background: #ffffff; border: 3px solid #cbd5e1;
-      padding: 8px 14px; border-radius: 18px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; min-width: 92px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .tab-item .tab-icon { font-size: 36px; line-height: 1.1; }
-    .tab-item .tab-text { font-size: 16px; font-weight: 800; color: #334155; margin-top: 2px; }
-    
-    .tab-item.active {
-      border-color: #2563eb; background-color: #eff6ff; transform: scale(1.02);
-      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
-    }
-    .tab-item.active .tab-text { color: #1d4ed8; }
-
-    /* 平板與手機響應式網格 */
-    .card-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
-      gap: 10px; max-width: 1000px; margin: 0 auto; padding-bottom: 30px;
-    }
-
-    @media (min-width: 768px) {
-      .card-grid { grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 14px; }
-      .card-icon { font-size: 52px !important; }
-      .card-label { font-size: 22px !important; }
-      .tab-item { min-width: 110px; padding: 10px 18px; }
-      .tab-item .tab-icon { font-size: 42px; }
-      .tab-item .tab-text { font-size: 18px; }
-    }
-
-    /* 圖卡基本樣式 */
-    .card {
-      background: #ffffff; border: 3px solid #e2e8f0; border-radius: 20px;
-      padding: 12px 6px; display: flex; flex-direction: column; align-items: center;
-      justify-content: center; cursor: pointer; touch-action: manipulation;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.04); transition: transform 0.08s;
-    }
-    .card:active { transform: scale(0.92); background-color: #e0f2fe; }
-    .card-icon { font-size: 44px; margin-bottom: 4px; }
-    .card-label { font-size: 20px; font-weight: 800; color: #0f172a; }
-
-    /* 類別邊框與色彩 */
-    .cat-core { border-color: #f97316; background-color: #fff7ed; }
-    .cat-food { border-color: #22c55e; background-color: #f0fdf4; }
-    .cat-actions { border-color: #06b6d4; background-color: #ecfeff; }
-    .cat-places { border-color: #a855f7; background-color: #faf5ff; }
-    .cat-people { border-color: #eab308; background-color: #fefce8; }
-    .cat-body { border-color: #ec4899; background-color: #fdf2f8; }
-    .cat-feelings { border-color: #ef4444; background-color: #fef2f2; }
-  </style>
-</head>
-<body>
-
-  <div class="sticky-header">
-    <div class="sentence-box">
-      <div id="sentence" class="sentence-text">點擊圖卡...</div>
-      <div style="display: flex;">
-        <button class="btn-speech" onclick="speakSentence()">🔊 發音</button>
-        <button class="btn-clear" onclick="clearSentence()">🗑️</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 大圖示分類選單 -->
-  <div class="category-scroll" id="categoryBar"></div>
-
-  <!-- 圖卡網格區 -->
+  <!-- 圖卡呈現網格區 -->
   <div class="card-grid" id="cardGrid"></div>
 
   <script>
@@ -294,9 +112,9 @@
       places: "cat-places", people: "cat-people", body: "cat-body", feelings: "cat-feelings"
     };
 
-    // 88 張完整 AAC 寫實圖卡資料集
+    // 完整 88 張兒童寫實 AAC 圖卡資料庫
     const cardsData = [
-      // 1. 常用需求 (包含尿尿、便便)
+      // 1. 常用需求 (已收錄尿尿、便便)
       ["core", "我想要", "🙋‍♂️"], ["core", "要", "⭕"], ["core", "不要", "❌"],
       ["core", "尿尿", "🚽"], ["core", "便便", "💩"], ["core", "幫忙", "🤝"],
       ["core", "洗手", "🧼"], ["core", "喝水", "🥛"], ["core", "抱抱", "🫂"],
@@ -318,7 +136,7 @@
       ["actions", "想睡覺", "🛌"], ["actions", "想出去玩", "🛝"], ["actions", "洗澡", "🛁"],
       ["actions", "聽音樂", "🎵"], ["actions", "散步", "🚶"], ["actions", "刷牙", "🪥"], ["actions", "坐下", "🪑"],
 
-      // 4. 常去地點 (15個)
+      // 4. 常去地點 (15個地點)
       ["places", "家", "🏠"], ["places", "學校", "🏫"], ["places", "教室", "🚪"],
       ["places", "公園", "🛝"], ["places", "醫院", "🏥"], ["places", "全聯", "🛒"],
       ["places", "超商", "🏪"], ["places", "麥當勞", "🍔"], ["places", "遊樂場", "🎡"],
@@ -330,7 +148,7 @@
       ["people", "阿嬤", "👵"], ["people", "老師", "👩‍🏫"], ["people", "醫生", "👨‍⚕️"],
       ["people", "警察", "👮"], ["people", "護理師", "👩‍⚕️"], ["people", "司機", "👨‍✈️"], ["people", "小朋友", "👧"],
 
-      // 6. 身體部位 (10個)
+      // 6. 身體部位 (10個部位)
       ["body", "手", "✋"], ["body", "腳", "🦶"], ["body", "頭", "🗣️"],
       ["body", "眼睛", "👀"], ["body", "鼻子", "👃"], ["body", "嘴巴", "👄"],
       ["body", "肚子", "🫃"], ["body", "耳朵", "👂"], ["body", "牙齒", "🦷"], ["body", "背", "🧍"],
@@ -343,13 +161,13 @@
     let currentSentence = [];
     let currentFilter = "all";
 
-    // 語音播放功能
+    // 語音發音
     function speakText(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'zh-TW';
-        msg.rate = 0.75; // 稍慢語速，適合聽覺理解
+        msg.rate = 0.75; // 適合兒童聆聽的清晰語速
         msg.pitch = 1.1;
         window.speechSynthesis.speak(msg);
       }
@@ -375,7 +193,7 @@
       updateDisplay();
     }
 
-    // 渲染頂部分類按鈕
+    // 渲染大圖示標題列
     function initCategoryBar() {
       const bar = document.getElementById("categoryBar");
       bar.innerHTML = "";
@@ -407,7 +225,7 @@
       });
     }
 
-    // 啟動初始化
+    // 頁面加載完成後自動初始化
     initCategoryBar();
     renderGrid();
   </script>
