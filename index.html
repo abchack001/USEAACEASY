@@ -6,414 +6,6 @@
   <title>兒童專屬 AAC 語音溝通板</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #f0f4f8; padding: 10px; text-align: center; user-select: none; }
-
-    /* 頂部固定的句子顯示區 */
-    .sticky-top { position: sticky; top: 0; z-index: 100; background-color: #f0f4f8; padding-bottom: 8px; }
-    .sentence-bar {
-      background: #ffffff; border: 4px solid #4a90e2; border-radius: 20px;
-      padding: 10px 14px; min-height: 70px; display: flex; align-items: center;
-      justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .sentence-text { font-size: 28px; font-weight: bold; color: #2c3e50; flex-grow: 1; text-align: left; }
-    .action-btn {
-      background-color: #2ecc71; color: white; border: none; padding: 12px 18px;
-      font-size: 20px; font-weight: bold; border-radius: 14px; cursor: pointer; margin-left: 8px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-    }
-    .action-btn:active { transform: scale(0.95); }
-    .clear-btn { background-color: #e74c3c; }
-
-    /* 大圖示分類切換標籤 (針對兒童設計大圖示按鈕) */
-    .category-tabs {
-      display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px;
-      margin-bottom: 10px; scrollbar-width: none;
-    }
-    .category-tabs::-webkit-scrollbar { display: none; }
-    
-    .tab-btn {
-      flex: 0 0 auto; background-color: #ffffff; border: 3px solid #cbd5e1;
-      padding: 8px 16px; border-radius: 18px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-width: 95px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    .tab-btn .tab-icon { font-size: 32px; margin-bottom: 2px; }
-    .tab-btn .tab-text { font-size: 17px; font-weight: bold; color: #334155; }
-    
-    .tab-btn.active {
-      border-color: #3b82f6; background-color: #eff6ff;
-      transform: scale(1.03); box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
-    }
-    .tab-btn.active .tab-text { color: #1d4ed8; }
-
-    /* 平板與手機響應式圖卡網格 */
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 10px; max-width: 1000px; margin: 0 auto; padding-bottom: 20px;
-    }
-
-    /* iPad 橫螢幕大版面優化 */
-    @media (min-width: 768px) {
-      .grid-container { grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 14px; }
-      .card-icon { font-size: 52px !important; }
-      .card-label { font-size: 24px !important; }
-      .tab-btn { min-width: 115px; padding: 10px 20px; }
-      .tab-btn .tab-icon { font-size: 38px; }
-      .tab-btn .tab-text { font-size: 19px; }
-    }
-
-    /* 單張圖卡樣式 */
-    .card {
-      background: #ffffff; border: 3px solid #e2e8f0; border-radius: 20px;
-      padding: 14px 6px; display: flex; flex-direction: column; align-items: center;
-      justify-content: center; cursor: pointer; touch-action: manipulation;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.06); transition: transform 0.08s, background-color 0.08s;
-    }
-    .card:active { transform: scale(0.91); background-color: #e0f2fe; }
-    .card-icon { font-size: 44px; margin-bottom: 4px; }
-    .card-label { font-size: 21px; font-weight: 800; color: #1e293b; line-height: 1.2; }
-
-    /* 高對比視覺分類色彩 */
-    .cat-core { border-color: #f97316; background-color: #fff7ed; }      /* 常用需求 - 橘色 */
-    .cat-food { border-color: #22c55e; background-color: #f0fdf4; }      /* 飲食零食 - 綠色 */
-    .cat-actions { border-color: #06b6d4; background-color: #ecfeff; }   /* 常用動作 - 青藍 */
-    .cat-places { border-color: #a855f7; background-color: #faf5ff; }    /* 地點場景 - 紫色 */
-    .cat-people { border-color: #eab308; background-color: #fefce8; }    /* 人物稱呼 - 黃色 */
-    .cat-body { border-color: #ec4899; background-color: #fdf2f8; }      /* 身體部位 - 粉紅 */
-    .cat-feelings { border-color: #ef4444; background-color: #fef2f2; }  /* 感覺情緒 - 紅色 */
-  </style>
-</head>
-<body>
-
-  <div class="sticky-top">
-    <!-- 上方句子組合區 -->
-    <div class="sentence-bar">
-      <div id="sentence" class="sentence-text">點卡片發音...</div>
-      <div style="display: flex; gap: 4px;">
-        <button class="action-btn" onclick="speakSentence()">🔊 發音</button>
-        <button class="action-btn clear-btn" onclick="clearSentence()">🗑️</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 分類按鈕區 (放大標題圖案與文字) -->
-  <div class="category-tabs">
-    <div class="tab-btn active" onclick="filterCategory('all', this)">
-      <span class="tab-icon">🌈</span><span class="tab-text">全部</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('core', this)">
-      <span class="tab-icon">⭐</span><span class="tab-text">常用需求</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('food', this)">
-      <span class="tab-icon">🍎</span><span class="tab-text">飲食零食</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('actions', this)">
-      <span class="tab-icon">🏃</span><span class="tab-text">常用動作</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('places', this)">
-      <span class="tab-icon">🏠</span><span class="tab-text">地點</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('people', this)">
-      <span class="tab-icon">👨‍👩‍👧</span><span class="tab-text">人物</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('body', this)">
-      <span class="tab-icon">✋</span><span class="tab-text">身體部位</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('feelings', this)">
-      <span class="tab-icon">❤️</span><span class="tab-text">感覺</span>
-    </div>
-  </div>
-
-  <!-- 圖卡展示區 -->
-  <div class="grid-container" id="cardGrid"></div>
-
-  <script>
-    // 完整 AAC 圖卡資料庫 (寫實易懂、高頻詞彙)
-    const cards = [
-      // 1. 常用需求 (包含挪過來的尿尿與便便)
-      { text: "我想要", icon: "🙋‍♂️", category: "core", class: "cat-core" },
-      { text: "要", icon: "⭕", category: "core", class: "cat-core" },
-      { text: "不要", icon: "❌", category: "core", class: "cat-core" },
-      { text: "尿尿", icon: "🚽", category: "core", class: "cat-core" },
-      { text: "便便", icon: "💩", category: "core", class: "cat-core" },
-      { text: "幫忙", icon: "🤝", category: "core", class: "cat-core" },
-      { text: "洗手", icon: "🧼", category: "core", class: "cat-core" },
-      { text: "喝水", icon: "🥛", category: "core", class: "cat-core" },
-      { text: "抱抱", icon: "🫂", category: "core", class: "cat-core" },
-      { text: "好", icon: "👍", category: "core", class: "cat-core" },
-      { text: "不好", icon: "👎", category: "core", class: "cat-core" },
-
-      // 2. 飲食與零食 (擴充15項水果 + 10項零食與主食)
-      { text: "吃", icon: "🍴", category: "food", class: "cat-food" },
-      { text: "喝", icon: "🧃", category: "food", class: "cat-food" },
-      // 水果類 (15項)
-      { text: "蘋果", icon: "🍎", category: "food", class: "cat-food" },
-      { text: "香蕉", icon: "🍌", category: "food", class: "cat-food" },
-      { text: "西瓜", icon: "🍉", category: "food", class: "cat-food" },
-      { text: "木瓜", icon: "🥭", category: "food", class: "cat-food" },
-      { text: "鳳梨", icon: "🍍", category: "food", class: "cat-food" },
-      { text: "奇異果", icon: "🥝", category: "food", class: "cat-food" },
-      { text: "草莓", icon: "🍓", category: "food", class: "cat-food" },
-      { text: "葡萄", icon: "🍇", category: "food", class: "cat-food" },
-      { text: "橘子", icon: "🍊", category: "food", class: "cat-food" },
-      { text: "芭樂", icon: "🍏", category: "food", class: "cat-food" },
-      { text: "櫻桃", icon: "🍒", category: "food", class: "cat-food" },
-      { text: "檸檬", icon: "🍋", category: "food", class: "cat-food" },
-      { text: "水蜜桃", icon: "🍑", category: "food", class: "cat-food" },
-      { text: "哈密瓜", icon: "🍈", category: "food", class: "cat-food" },
-      { text: "藍莓", icon: "🫐", category: "food", class: "cat-food" },
-      // 零食與餐點 (10+項)
-      { text: "餅乾", icon: "🍪", category: "food", class: "cat-food" },
-      { text: "優格", icon: "🥛", category: "food", class: "cat-food" },
-      { text: "果凍", icon: "🍮", category: "food", class: "cat-food" },
-      { text: "布丁", icon: "🍮", category: "food", class: "cat-food" },
-      { text: "蛋糕", icon: "🍰", category: "food", class: "cat-food" },
-      { text: "冰淇淋", icon: "🍦", category: "food", class: "cat-food" },
-      { text: "糖果", icon: "🍬", category: "food", class: "cat-food" },
-      { text: "薯條", icon: "🍟", category: "food", class: "cat-food" },
-      { text: "麵包", icon: "🍞", category: "food", class: "cat-food" },
-      { text: "巧克力", icon: "🍫", category: "food", class: "cat-food" },
-      { text: "飯", icon: "🍚", category: "food", class: "cat-food" },
-      { text: "麵", icon: "🍜", category: "food", class: "cat-food" },
-
-      // 3. 常用動作 (新增玩玩具、看電視、肚子餓、想睡覺、想出去玩等)
-      { text: "玩玩具", icon: "🧸", category: "actions", class: "cat-actions" },
-      { text: "看電視", icon: "📺", category: "actions", class: "cat-actions" },
-      { text: "肚子餓", icon: "🤤", category: "actions", class: "cat-actions" },
-      { text: "想睡覺", icon: "🛌", category: "actions", class: "cat-actions" },
-      { text: "想出去玩", icon: "🛝", category: "actions", class: "cat-actions" },
-      { text: "洗澡", icon: "🛁", category: "actions", class: "cat-actions" },
-      { text: "聽音樂", icon: "🎵", category: "actions", class: "cat-actions" },
-      { text: "散步", icon: "🚶", category: "actions", class: "cat-actions" },
-      { text: "刷牙這套依據您的 8 大需求全面升級的 **兒童 AAC 語音溝通網頁 (iPad / 手機專用版)**，特別參考了您提供的溝通圖卡與高頻核心字詞資料 [1]。
-
-針對 6 歲孩童的視覺辨識與觸控習慣，進行了以下升級：
-1. **加大分類標題與圖案**：頂部選單採用超大圖示與高對比色彩，讓孩子一眼就能看懂 [2]。
-2. **直覺易懂的寫實圖案**：選用貼近真實生活的寫實 Emoji 與色彩搭配。
-3. **完美支援 iPad 與手機**：專為觸控螢幕設計，卡片大且不易誤觸，頂部設有固定式句子組合欄。
-4. **完整收錄 80+ 項常用單字**：包含需求、水果、零食、動作、15 個常去地點、人物、10 個身體部位及情緒 [1]。
-
----
-
-### 📱 兒童 AAC 語音溝通網頁完整程式碼
-
-請將以下程式碼複製並另存為 `.html` 檔案（例如：`aac_child.html`），透過 AirDrop、Line 或 Email 傳至 iPad 或手機開啟即可使用，**不需連網**。
-
-```html
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>兒童 AAC 語音溝通板</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background-color: #f0f4f8; padding: 10px; text-align: center; user-select: none; }
-
-    /* 頂部固定的句子顯示區 */
-    .sticky-top { position: sticky; top: 0; z-index: 100; background-color: #f0f4f8; padding-bottom: 8px; }
-    .sentence-bar {
-      background: #ffffff; border: 4px solid #3b82f6; border-radius: 20px;
-      padding: 10px 14px; min-height: 70px; display: flex; align-items: center;
-      justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .sentence-text { font-size: 26px; font-weight: bold; color: #1e293b; flex-grow: 1; text-align: left; }
-    .action-btn {
-      background-color: #22c55e; color: white; border: none; padding: 10px 16px;
-      font-size: 18px; font-weight: bold; border-radius: 14px; cursor: pointer; margin-left: 6px;
-    }
-    .clear-btn { background-color: #ef4444; }
-
-    /* 大圖示分類按鈕區 (專為幼童加大設計) */
-    .category-tabs {
-      display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px;
-      margin-bottom: 12px; scrollbar-width: none;
-    }
-    .category-tabs::-webkit-scrollbar { display: none; }
-    
-    .tab-btn {
-      flex: 0 0 auto; background-color: #ffffff; border: 3px solid #cbd5e1;
-      padding: 8px 14px; border-radius: 18px; cursor: pointer;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-width: 90px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    .tab-btn .tab-icon { font-size: 34px; line-height: 1.1; }
-    .tab-btn .tab-text { font-size: 16px; font-weight: bold; color: #334155; margin-top: 2px; }
-    
-    .tab-btn.active {
-      border-color: #2563eb; background-color: #eff6ff;
-      transform: scale(1.03); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-    }
-    .tab-btn.active .tab-text { color: #1d4ed8; }
-
-    /* 平板與手機響應式網格 */
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 10px; max-width: 1000px; margin: 0 auto; padding-bottom: 30px;
-    }
-
-    @media (min-width: 768px) {
-      .grid-container { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 14px; }
-      .card-icon { font-size: 50px !important; }
-      .card-label { font-size: 22px !important; }
-      .tab-btn { min-width: 110px; padding: 10px 18px; }
-      .tab-btn .tab-icon { font-size: 40px; }
-      .tab-btn .tab-text { font-size: 18px; }
-    }
-
-    /* 單張圖卡樣式 */
-    .card {
-      background: #ffffff; border: 3px solid #e2e8f0; border-radius: 20px;
-      padding: 12px 6px; display: flex; flex-direction: column; align-items: center;
-      justify-content: center; cursor: pointer; touch-action: manipulation;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: transform 0.08s, background-color 0.08s;
-    }
-    .card:active { transform: scale(0.92); background-color: #e0f2fe; }
-    .card-icon { font-size: 42px; margin-bottom: 4px; }
-    .card-label { font-size: 20px; font-weight: 800; color: #1e293b; }
-
-    /* 高對比分類色彩 */
-    .cat-core { border-color: #f97316; background-color: #fff7ed; }
-    .cat-food { border-color: #22c55e; background-color: #f0fdf4; }
-    .cat-actions { border-color: #06b6d4; background-color: #ecfeff; }
-    .cat-places { border-color: #a855f7; background-color: #faf5ff; }
-    .cat-people { border-color: #eab308; background-color: #fefce8; }
-    .cat-body { border-color: #ec4899; background-color: #fdf2f8; }
-    .cat-feelings { border-color: #ef4444; background-color: #fef2f2; }
-  </style>
-</head>
-<body>
-
-  <div class="sticky-top">
-    <!-- 上方句子組合區 -->
-    <div class="sentence-bar">
-      <div id="sentence" class="sentence-text">點擊圖卡...</div>
-      <div style="display: flex; gap: 4px;">
-        <button class="action-btn" onclick="speakSentence()">🔊 發音</button>
-        <button class="action-btn clear-btn" onclick="clearSentence()">🗑️</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 放大標題圖案與文字分類按鈕 -->
-  <div class="category-tabs">
-    <div class="tab-btn active" onclick="filterCategory('all', this)">
-      <span class="tab-icon">🌈</span><span class="tab-text">全部</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('core', this)">
-      <span class="tab-icon">⭐</span><span class="tab-text">常用需求</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('food', this)">
-      <span class="tab-icon">🍎</span><span class="tab-text">飲食零食</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('actions', this)">
-      <span class="tab-icon">🏃</span><span class="tab-text">常用動作</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('places', this)">
-      <span class="tab-icon">🏠</span><span class="tab-text">地點</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('people', this)">
-      <span class="tab-icon">👨‍👩‍👧</span><span class="tab-text">人物</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('body', this)">
-      <span class="tab-icon">✋</span><span class="tab-text">身體部位</span>
-    </div>
-    <div class="tab-btn" onclick="filterCategory('feelings', this)">
-      <span class="tab-icon">❤️</span><span class="tab-text">感覺</span>
-    </div>
-  </div>
-
-  <!-- 圖卡展示區 -->
-  <div class="grid-container" id="cardGrid"></div>
-
-  <script>
-    // 完整 AAC 寫實圖卡庫
-    const cards = [
-      // 1. 常用需求 (已將尿尿與便便移動至此)
-      { text: "我想要", icon: "🙋‍♂️", category: "core", class: "cat-core" },
-      { text: "要", icon: "⭕", category: "core", class: "cat-core" },
-      { text: "不要", icon: "❌", category: "core", class: "cat-core" },
-      { text: "尿尿", icon: "🚽", category: "core", class: "cat-core" },
-      { text: "便便", icon: "💩", category: "core", class: "cat-core" },
-      { text: "幫忙", icon: "🤝", category: "core", class: "cat-core" },
-      { text: "洗手", icon: "🧼", category: "core", class: "cat-core" },
-      { text: "喝水", icon: "🥛", category: "core", class: "cat-core" },
-      { text: "抱抱", icon: "🫂", category: "core", class: "cat-core" },
-      { text: "好", icon: "👍", category: "core", class: "cat-core" },
-
-      // 2. 飲食零食 (15種水果 + 10種零食與主食)
-      { text: "西瓜", icon: "🍉", category: "food", class: "cat-food" },
-      { text: "木瓜", icon: "🥭", category: "food", class: "cat-food" },
-      { text: "鳳梨", icon: "🍍", category: "food", class: "cat-food" },
-      { text: "奇異果", icon: "🥝", category: "food", class: "cat-food" },
-      { text: "草莓", icon: "🍓", category: "food", class: "cat-food" },
-      { text: "葡萄", icon: "🍇", category: "food", class: "cat-food" },
-      { text: "蘋果", icon: "🍎", category: "food", class: "cat-food" },
-      { text: "香蕉", icon: "🍌", category: "food", class: "cat-food" },
-      { text: "橘子", icon: "🍊", category: "food", class: "cat-food" },
-      { text: "芭樂", icon: "🍏", category: "food", class: "cat-food" },
-      { text: "櫻桃", icon: "🍒", category: "food", class: "cat-food" },
-      { text: "檸檬", icon: "🍋", category: "food", class: "cat-food" },
-      { text: "水蜜桃", icon: "🍑", category: "food", class: "cat-food" },
-      { text: "哈密瓜", icon: "🍈", category: "food", class: "cat-food" },
-      { text: "藍莓", icon: "🫐", category: "food", class: "cat-food" },
-      { text: "餅乾", icon: "🍪", category: "food", class: "cat-food" },
-      { text: "優格", icon: "🥛", category: "food", class: "cat-food" },
-      { text: "果凍", icon: "🍮", category: "food", class: "cat-food" },
-      { text: "布丁", icon: "🍮", category: "food", class: "cat-food" },
-      { text: "蛋糕", icon: "🍰", category: "food", class: "cat-food" },
-      { text: "冰淇淋", icon: "🍦", category: "food", class: "cat-food" },
-      { text: "糖果", icon: "🍬", category: "food", class: "cat-food" },
-      { text: "薯條", icon: "🍟", category: "food", class: "cat-food" },
-      { text: "麵包", icon: "🍞", category: "food", class: "cat-food" },
-      { text: "巧克力", icon: "🍫", category: "food", class: "cat-food" },
-      { text: "吃飯", icon: "🍚", category: "food", class: "cat-food" },
-
-      // 3. 常用動作 (新增玩玩具、看電視、肚子餓、想睡覺、想出去玩等)
-      { text: "玩玩具", icon: "🧸", category: "actions", class: "cat-actions" },
-      { text: "看電視", icon: "📺", category: "actions", class: "cat-actions" },
-      { text: "肚子餓", icon: "🤤", category: "actions", class: "cat-actions" },
-      { text: "想睡覺", icon: "🛌", category: "actions", class: "cat-actions" },
-      { text: "想出去玩", icon: "🛝", category: "actions", class: "cat-actions" },
-      { text: "洗澡", icon: "🛁", category: "actions", class: "cat-actions" },
-      { text: "聽音樂", icon: "🎵", category: "actions", class: "cat-actions" },
-      { text: "散步", icon: "🚶", category: "actions", class: "cat-actions" },
-      { text: "刷牙", icon: "🪥", category: "actions", class: "cat-actions" },
-      { text: "坐下", icon: "🪑", category: "actions", class: "cat-actions" },
-
-      // 4. 常去地點 (15個小孩日常地點)
-      { text: "家", icon: "🏠", category: "places", class: "cat-places" },
-      { text: "學校", icon: "🏫", category: "places", class: "cat-places" },
-      { text: "教室", icon: "🚪這套為您的孩子升級設計的 **iPad / 手機專用 AAC 兒童語音溝通網頁**，針對 6 歲全面性發展遲緩及無口語幼童的認知與視覺特性進行了全面優化 [1, 2]。
-
-本次更新重點：
-1. **大圖示分類選單**：標題按鈕特別加大並配上醒目圖案，方便孩子憑視覺快速辨識分類。
-2. **位置調整**：「尿尿」與「便便」已移至最優先的「常用需求」類別中。
-3. **大量擴充寫實單字**：
-   * **飲食水果**：新增 15 種常見水果（西瓜、木瓜、鳳梨、奇異果、草莓、葡萄等）與 10 種點心零食（餅乾、優格、果凍、布丁、冰淇淋等）。
-   * **常用動作**：加入玩玩具、看電視、肚子餓、想睡覺、想出去玩等動作 [1]。
-   * **常去地點（新功能）**：收錄 15 個常見地點（家、學校、教室、公園、醫院、全聯、超商、麥當勞等）。
-   * **人物稱呼**：擴充醫生、警察、護理師、司機、老師等 [1]。
-   * **身體部位（新功能）**：收錄手、腳、頭、眼睛、鼻子、嘴巴、肚子、耳朵、牙齒、背部 10 個部位 [1]。
-4. **平板/手機觸控最佳化**：防誤觸大按鈕設計，上方設有固定式「句子組合區」與語音發音按鈕。
-
----
-
-### 💻 兒童 AAC 語音溝通網頁程式碼
-
-請將以下程式碼複製並另存為 `.html` 檔案（例如：`aac_child.html`），透過 AirDrop、Line 或 Email 傳至 iPad 或手機開啟即可使用，**完全不需連網**。
-
-```html
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>兒童專屬 AAC 語音溝通板</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: #f1f5f9; padding: 10px; text-align: center; user-select: none; }
 
     /* 頂部固定的句子組合區 */
@@ -427,7 +19,7 @@
     .btn-speech { background-color: #22c55e; color: white; border: none; padding: 10px 16px; font-size: 18px; font-weight: bold; border-radius: 14px; cursor: pointer; }
     .btn-clear { background-color: #ef4444; color: white; border: none; padding: 10px 14px; font-size: 18px; font-weight: bold; border-radius: 14px; cursor: pointer; margin-left: 6px; }
 
-    /* 大圖示分類標題按鈕區 (放大標題與圖案，方便幼童辨識) */
+    /* 大圖示分類標題按鈕區 */
     .category-scroll {
       display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px;
       margin-bottom: 10px; scrollbar-width: none;
@@ -475,7 +67,7 @@
     .card-icon { font-size: 44px; margin-bottom: 4px; }
     .card-label { font-size: 20px; font-weight: 800; color: #0f172a; }
 
-    /* 類別配色 (增強視覺對比) */
+    /* 類別配色 */
     .cat-core { border-color: #f97316; background-color: #fff7ed; }
     .cat-food { border-color: #22c55e; background-color: #f0fdf4; }
     .cat-actions { border-color: #06b6d4; background-color: #ecfeff; }
@@ -497,98 +89,278 @@
     </div>
   </div>
 
-  <!-- 分類選單 (大圖示+大標題) -->
+  <!-- 分類選單 -->
   <div class="category-scroll" id="categoryBar"></div>
 
-  <!-- 圖卡呈現網格 -->
+  <!-- 圖卡網格 -->
   <div class="card-grid" id="cardGrid"></div>
 
   <script>
-    // 1. 分類設定 (大型圖標與主題色)
-    const categories = {
-      all: { name: "全部", icon: "🌈" },
-      core: { name: "常用需求", icon: "⭐" },
-      food: { name: "飲食零食", icon: "🍎" },
-      actions: { name: "常用動作", icon: "🏃" },
-      places: { name: "常去地點", icon: "🏠" },
-      people: { name: "人物稱呼", icon: "👨‍👩‍👧" },
-      body: { name: "身體部位", icon: "✋" },
-      feelings: { name: "感覺心情", icon: "❤️" }
-    };
+    const categories = [
+      { id: "all", name: "全部", icon: "🌈" },
+      { id: "core", name: "常用需求", icon: "⭐" },
+      { id: "food", name: "飲食零食", icon: "🍎" },
+      { id: "actions", name: "常用動作", icon: "🏃" },
+      { id: "places", name: "常去地點", icon: "🏠" },
+      { id: "people", name: "人物稱呼", icon: "👨‍👩‍👧" },
+      { id: "body", name: "身體部位", icon: "✋" },
+      { id: "feelings", name: "感覺心情", icon: "❤️" }
+    ];
 
-    // 2. 圖卡資料庫 (精簡結構，包含80+項兒童實用詞彙)
-    const rawData = [
-      // 常用需求 (尿尿、便便已移至此處)
-      ["core", "我想要", "🙋‍♂️", "cat-core"], ["core", "要", "⭕", "cat-core"], ["core", "不要", "❌", "cat-core"],
-      ["core", "尿尿", "🚽", "cat-core"], ["core", "便便", "💩", "cat-core"], ["core", "幫忙", "🤝", "cat-core"],
-      ["core", "喝水", "🥛", "cat-core"], ["core", "抱抱", "🫂", "cat-core"], ["core", "好", "👍", "cat-core"], ["core", "不好", "👎", "cat-core"],
+    const cards = [
+      // 常用需求 (包含尿尿、便便)
+      { cat: "core", text: "我想要", icon: "🙋‍♂️", cls: "cat-core" },
+      { cat: "core", text: "要", icon: "⭕", cls: "cat-core" },
+      { cat: "core", text: "不要", icon: "❌", cls: "cat-core" },
+      { cat: "core", text: "尿尿", icon: "🚽", cls: "cat-core" },
+      { cat: "core", text: "便便", icon: "💩", cls: "cat-core" },
+      { cat: "core", text: "幫忙", icon: "🤝", cls: "cat-core" },
+      { cat: "core", text: "洗手", icon: "🧼", cls: "cat-core" },
+      { cat: "core", text: "喝水", icon: "🥛", cls: "cat-core" },
+      { cat: "core", text: "抱抱", icon: "🫂", cls: "cat-core" },
+      { cat: "core", text: "好", icon: "👍", cls: "cat-core" },
+      { cat: "core", text: "不好", icon: "👎", cls: "cat-core" },
 
-      // 飲食與水果零食 (15水果 + 10零食/主食)
-      ["food", "西瓜", "🍉", "cat-food"], ["food", "木瓜", "🥭", "cat-food"], ["food", "鳳梨", "🍍", "cat-food"],
-      ["food", "奇異果", "🥝", "cat-food"], ["food", "草莓", "🍓", "cat-food"], ["food", "葡萄", "🍇", "cat-food"],
-      ["food", "蘋果", "🍎", "cat-food"], ["food", "香蕉", "🍌", "cat-food"], ["food", "橘子", "🍊", "cat-food"],
-      ["food", "芭樂", "🍏", "cat-food"], ["food", "櫻桃", "🍒", "cat-food"], ["food", "檸檬", "🍋", "cat-food"],
-      ["food", "水蜜桃", "🍑", "cat-food"], ["food", "哈密瓜", "🍈", "cat-food"], ["food", "藍莓", "🫐", "cat-food"],
-      ["food", "餅乾", "🍪", "cat-food"], ["food", "優格", "🥛", "cat-food"], ["food", "果凍", "🍮", "cat-food"],
-      ["food", "布丁", "🍮", "cat-food"], ["food", "蛋糕", "🍰", "cat-food"], ["food", "冰淇淋", "🍦", "cat-food"],
-      ["food", "糖果", "🍬", "cat-food"], ["food", "薯條", "🍟", "cat-food"], ["food", "麵包", "🍞", "cat-food"],
-      ["food", "巧克力", "🍫", "cat-food"], ["food", "吃飯", "🍚", "cat-food"], ["food", "吃麵", "🍜", "cat-food"],
+      // 飲食零食 (15種水果 + 10種零食點心)
+      { cat: "food", text: "西瓜", icon: "🍉", cls: "cat-food" },
+      { cat: "food", text: "木瓜", icon: "🥭", cls: "cat-food" },
+      { cat: "food", text: "鳳梨", icon: "🍍", cls: "cat-food" },
+      { cat: "food", text: "奇異果", icon: "🥝", cls: "cat-food" },
+      { cat: "food", text: "草莓", icon: "🍓", cls: "cat-food" },
+      { cat: "food", text: "葡萄", icon: "🍇", cls: "cat-food" },
+      { cat: "food", text: "蘋果", icon: "🍎", cls: "cat-food" },
+      { cat: "food", text: "香蕉", icon: "🍌", cls: "cat-food" },
+      { cat: "food", text: "橘子", icon: "🍊", cls: "cat-food" },
+      { cat: "food", text: "芭樂", icon: "🍏", cls: "cat-food" },
+      { cat: "food", text: "櫻桃", icon: "🍒", cls: "cat-food" },
+      { cat: "food", text: "檸檬", icon: "🍋", cls: "cat-food" },
+      { cat: "food", text: "水蜜桃", icon: "🍑", cls: "cat-food" },
+      { cat: "food", text: "哈密瓜", icon: "🍈", cls: "cat-food" },
+      { cat: "food", text: "藍莓", icon: "🫐", cls: "cat-food" },
+      { cat: "food", text: "餅乾", icon: "🍪", cls: "cat-food" },
+      { cat: "food", text: "優格", icon: "🥛", cls: "cat-food" },
+      { cat: "food", text: "果凍", icon: "🍮", cls: "cat-food" },
+      { cat: "food", text: "布丁", icon: "🍮", cls: "cat-food" },
+      { cat: "food", text: "蛋糕", icon: "🍰", cls: "cat-food" },
+      { cat: "food", text: "冰淇淋", icon: "🍦", cls: "cat-food" },
+      { cat: "food", text: "糖果", icon: "🍬", cls: "cat-food" },
+      { cat: "food", text: "薯條", icon: "🍟", cls: "cat-food" },
+      { cat: "food", text: "麵包", icon: "🍞", cls: "cat-food" },
+      { cat: "food", text: "巧克力", icon: "🍫", cls: "cat-food" },
+      { cat: "food", text: "吃飯", icon: "🍚", cls: "cat-food" },
+      { cat: "food", text: "吃麵", icon: "🍜", cls: "cat-food" },
 
       // 常用動作
-      ["actions", "玩玩具", "🧸", "cat-actions"], ["actions", "看電視", "📺", "cat-actions"],
-      ["actions", "肚子餓", "🤤", "cat-actions"], ["actions", "想睡覺", "🛌", "cat-actions"],
-      ["actions", "想出去玩", "🛝", "cat-actions"], ["actions", "洗澡", "🛁", "cat-actions"],
-      ["actions", "聽音樂", "🎵", "cat-actions"], ["actions", "散步", "🚶", "cat-actions"],
-      ["actions", "刷牙", "🪥", "cat-actions"], ["actions", "坐下", "🪑", "cat-actions"],
+      { cat: "actions", text: "玩玩具", icon: "🧸", cls: "cat-actions" },
+      { cat: "actions", text: "看電視", icon: "📺", cls: "cat-actions" },
+      { cat: "actions", text: "肚子餓", icon: "🤤", cls: "cat-actions" },
+      { cat: "actions", text: "想睡覺", icon: "🛌", cls: "cat-actions" },
+      { cat: "actions", text: "想出去玩", icon: "🛝", cls: "cat-actions" },
+      { cat: "actions", text: "洗澡", icon: "🛁", cls: "cat-actions" },
+      { cat: "actions", text: "聽音樂", icon: "🎵", cls: "cat-actions" },
+      { cat: "actions", text: "散步", icon: "🚶", cls: "cat-actions" },
+      { cat: "actions", text: "刷牙", icon: "🪥", cls: "cat-actions" },
+      { cat: "actions", text: "坐下", icon: "🪑", cls: "cat-actions" },
 
-      // 常去地點 (15個地點)
-      ["places", "家", "🏠", "cat-places"], ["places", "學校", "🏫", "cat-places"], ["places", "教室", "🚪", "cat-places"],
-      ["places", "公園", "🛝", "cat-places"], ["places", "醫院", "🏥", "cat-places"], ["places", "全聯", "🛒", "cat-places"],
-      ["places", "超商", "🏪", "cat-places"], ["places", "麥當勞", "🍔", "cat-places"], ["places", "遊樂場", "🎡", "cat-places"],
-      ["places", "復健中心", "🏥", "cat-places"], ["places", "阿公阿嬤家", "👵", "cat-places"], ["places", "早餐店", "🍳", "cat-places"],
-      ["places", "夜市", "🍧", "cat-places"], ["places", "圖書館", "📚", "cat-places"], ["places", "游泳池", "🏊", "cat-places"],
+      // 常去地點 (15個)
+      { cat: "places", text: "家", icon: "🏠", cls: "cat-places" },
+      { cat: "places", text: "學校", icon: "🏫", cls: "cat-places" },
+      { cat: "places", text: "教室", icon: "🚪", cls: "cat-places" },
+      { cat: "places", text: "公園", icon: "🛝", cls: "cat-places" },
+      { cat: "places", text: "醫院", icon: "🏥", cls: "cat-places" },
+      { cat: "places", text: "全聯", icon: "🛒", cls: "cat-places" },
+非常抱歉！上一版的程式碼因為資料較多，長度過長導致輸出中斷。
 
-      // 人物稱呼
-      ["people", "爸爸", "👨", "cat-people"], ["people", "媽媽", "👩", "cat-people"], ["people", "阿公", "👴", "cat-people"],
-      ["people", "阿嬤", "👵", "cat-people"], ["people", "老師", "👩‍🏫", "cat-people"], ["people", "醫生", "👨‍⚕️", "cat-people"],
-      ["people", "警察", "👮", "cat-people"], ["people", "護理師", "👩‍⚕️", "cat-people"], ["people", "司機", "👨‍✈️", "cat-people"],
-      ["people", "小朋友", "👧", "cat-people"],
+這次我採用了**精簡高效的資料結構**，確保程式碼一次完整提供、不會中斷，並能100% 正常顯示所有 **88 張圖卡**與**放大版分類選單**！
 
-      // 身體部位 (10個部位)
-      ["body", "手", "✋", "cat-body"], ["body", "腳", "🦶", "cat-body"], ["body", "頭", "🗣️", "cat-body"],
-      ["body", "眼睛", "👀", "cat-body"], ["body", "鼻子", "👃", "cat-body"], ["body", "嘴巴", "👄", "cat-body"],
-      ["body", "肚子", "🫃", "cat-body"], ["body", "耳朵", "👂", "cat-body"], ["body", "牙齒", "🦷", "cat-body"],
-      ["body", "背", "🧍", "cat-body"],
+---
 
-      // 感覺心情
-      ["feelings", "痛", "🩹", "cat-feelings"], ["feelings", "累", "😫", "cat-feelings"],
-      ["feelings", "生氣", "😡", "cat-feelings"], ["feelings", "害怕", "😨", "cat-feelings"],
-      ["feelings", "高興", "😄", "cat-feelings"]
+### 📱 兒童專屬 AAC 語音溝通網頁（完整修復版）
+
+請複製以下框內的**完整 HTML 程式碼**，另存為 `.html` 檔案（例如：`aac_child.html`），傳至 iPad 或手機開啟即可使用，**完全不需連網**：
+
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>兒童 AAC 語音溝通板</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: #f1f5f9; padding: 10px; text-align: center; user-select: none; }
+
+    /* 頂部固定的句子組合區 */
+    .sticky-header { position: sticky; top: 0; z-index: 100; background-color: #f1f5f9; padding-bottom: 8px; }
+    .sentence-box {
+      background: #ffffff; border: 4px solid #3b82f6; border-radius: 20px;
+      padding: 10px 14px; min-height: 72px; display: flex; align-items: center;
+      justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .sentence-text { font-size: 26px; font-weight: bold; color: #1e293b; flex-grow: 1; text-align: left; }
+    .btn-speech { background-color: #22c55e; color: white; border: none; padding: 10px 16px; font-size: 18px; font-weight: bold; border-radius: 14px; cursor: pointer; }
+    .btn-clear { background-color: #ef4444; color: white; border: none; padding: 10px 14px; font-size: 18px; font-weight: bold; border-radius: 14px; cursor: pointer; margin-left: 6px; }
+
+    /* 大圖示分類選單 */
+    .category-scroll {
+      display: flex; gap: 8px; overflow-x: auto; padding: 6px 2px;
+      margin-bottom: 12px; scrollbar-width: none;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    
+    .tab-item {
+      flex: 0 0 auto; background: #ffffff; border: 3px solid #cbd5e1;
+      padding: 8px 14px; border-radius: 18px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; min-width: 92px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .tab-item .tab-icon { font-size: 36px; line-height: 1.1; }
+    .tab-item .tab-text { font-size: 16px; font-weight: 800; color: #334155; margin-top: 2px; }
+    
+    .tab-item.active {
+      border-color: #2563eb; background-color: #eff6ff; transform: scale(1.02);
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+    }
+    .tab-item.active .tab-text { color: #1d4ed8; }
+
+    /* 平板與手機響應式網格 */
+    .card-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+      gap: 10px; max-width: 1000px; margin: 0 auto; padding-bottom: 30px;
+    }
+
+    @media (min-width: 768px) {
+      .card-grid { grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 14px; }
+      .card-icon { font-size: 52px !important; }
+      .card-label { font-size: 22px !important; }
+      .tab-item { min-width: 110px; padding: 10px 18px; }
+      .tab-item .tab-icon { font-size: 42px; }
+      .tab-item .tab-text { font-size: 18px; }
+    }
+
+    /* 圖卡基本樣式 */
+    .card {
+      background: #ffffff; border: 3px solid #e2e8f0; border-radius: 20px;
+      padding: 12px 6px; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; cursor: pointer; touch-action: manipulation;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.04); transition: transform 0.08s;
+    }
+    .card:active { transform: scale(0.92); background-color: #e0f2fe; }
+    .card-icon { font-size: 44px; margin-bottom: 4px; }
+    .card-label { font-size: 20px; font-weight: 800; color: #0f172a; }
+
+    /* 類別邊框與色彩 */
+    .cat-core { border-color: #f97316; background-color: #fff7ed; }
+    .cat-food { border-color: #22c55e; background-color: #f0fdf4; }
+    .cat-actions { border-color: #06b6d4; background-color: #ecfeff; }
+    .cat-places { border-color: #a855f7; background-color: #faf5ff; }
+    .cat-people { border-color: #eab308; background-color: #fefce8; }
+    .cat-body { border-color: #ec4899; background-color: #fdf2f8; }
+    .cat-feelings { border-color: #ef4444; background-color: #fef2f2; }
+  </style>
+</head>
+<body>
+
+  <div class="sticky-header">
+    <div class="sentence-box">
+      <div id="sentence" class="sentence-text">點擊圖卡...</div>
+      <div style="display: flex;">
+        <button class="btn-speech" onclick="speakSentence()">🔊 發音</button>
+        <button class="btn-clear" onclick="clearSentence()">🗑️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 大圖示分類選單 -->
+  <div class="category-scroll" id="categoryBar"></div>
+
+  <!-- 圖卡網格區 -->
+  <div class="card-grid" id="cardGrid"></div>
+
+  <script>
+    const categories = [
+      { id: "all", name: "全部", icon: "🌈" },
+      { id: "core", name: "常用需求", icon: "⭐" },
+      { id: "food", name: "飲食零食", icon: "🍎" },
+      { id: "actions", name: "常用動作", icon: "🏃" },
+      { id: "places", name: "常去地點", icon: "🏠" },
+      { id: "people", name: "人物稱呼", icon: "👨‍👩‍👧" },
+      { id: "body", name: "身體部位", icon: "✋" },
+      { id: "feelings", name: "感覺心情", icon: "❤️" }
+    ];
+
+    const classMap = {
+      core: "cat-core", food: "cat-food", actions: "cat-actions",
+      places: "cat-places", people: "cat-people", body: "cat-body", feelings: "cat-feelings"
+    };
+
+    // 88 張完整 AAC 寫實圖卡資料集
+    const cardsData = [
+      // 1. 常用需求 (包含尿尿、便便)
+      ["core", "我想要", "🙋‍♂️"], ["core", "要", "⭕"], ["core", "不要", "❌"],
+      ["core", "尿尿", "🚽"], ["core", "便便", "💩"], ["core", "幫忙", "🤝"],
+      ["core", "洗手", "🧼"], ["core", "喝水", "🥛"], ["core", "抱抱", "🫂"],
+      ["core", "好", "👍"], ["core", "不好", "👎"],
+
+      // 2. 飲食零食 (15種水果 + 10種零食與餐點)
+      ["food", "西瓜", "🍉"], ["food", "木瓜", "🥭"], ["food", "鳳梨", "🍍"],
+      ["food", "奇異果", "🥝"], ["food", "草莓", "🍓"], ["food", "葡萄", "🍇"],
+      ["food", "蘋果", "🍎"], ["food", "香蕉", "🍌"], ["food", "橘子", "🍊"],
+      ["food", "芭樂", "🍏"], ["food", "櫻桃", "🍒"], ["food", "檸檬", "🍋"],
+      ["food", "水蜜桃", "🍑"], ["food", "哈密瓜", "🍈"], ["food", "藍莓", "🫐"],
+      ["food", "餅乾", "🍪"], ["food", "優格", "🥛"], ["food", "果凍", "🍮"],
+      ["food", "布丁", "🍮"], ["food", "蛋糕", "🍰"], ["food", "冰淇淋", "🍦"],
+      ["food", "糖果", "🍬"], ["food", "薯條", "🍟"], ["food", "麵包", "🍞"],
+      ["food", "巧克力", "🍫"], ["food", "吃飯", "🍚"], ["food", "吃麵", "🍜"],
+
+      // 3. 常用動作
+      ["actions", "玩玩具", "🧸"], ["actions", "看電視", "📺"], ["actions", "肚子餓", "🤤"],
+      ["actions", "想睡覺", "🛌"], ["actions", "想出去玩", "🛝"], ["actions", "洗澡", "🛁"],
+      ["actions", "聽音樂", "🎵"], ["actions", "散步", "🚶"], ["actions", "刷牙", "🪥"], ["actions", "坐下", "🪑"],
+
+      // 4. 常去地點 (15個)
+      ["places", "家", "🏠"], ["places", "學校", "🏫"], ["places", "教室", "🚪"],
+      ["places", "公園", "🛝"], ["places", "醫院", "🏥"], ["places", "全聯", "🛒"],
+      ["places", "超商", "🏪"], ["places", "麥當勞", "🍔"], ["places", "遊樂場", "🎡"],
+      ["places", "復健中心", "🏥"], ["places", "阿公阿嬤家", "👵"], ["places", "早餐店", "🍳"],
+      ["places", "夜市", "🍧"], ["places", "圖書館", "📚"], ["places", "游泳池", "🏊"],
+
+      // 5. 人物稱呼
+      ["people", "爸爸", "👨"], ["people", "媽媽", "👩"], ["people", "阿公", "👴"],
+      ["people", "阿嬤", "👵"], ["people", "老師", "👩‍🏫"], ["people", "醫生", "👨‍⚕️"],
+      ["people", "警察", "👮"], ["people", "護理師", "👩‍⚕️"], ["people", "司機", "👨‍✈️"], ["people", "小朋友", "👧"],
+
+      // 6. 身體部位 (10個)
+      ["body", "手", "✋"], ["body", "腳", "🦶"], ["body", "頭", "🗣️"],
+      ["body", "眼睛", "👀"], ["body", "鼻子", "👃"], ["body", "嘴巴", "👄"],
+      ["body", "肚子", "🫃"], ["body", "耳朵", "👂"], ["body", "牙齒", "🦷"], ["body", "背", "🧍"],
+
+      // 7. 感覺心情
+      ["feelings", "痛", "🩹"], ["feelings", "累", "😫"], ["feelings", "生氣", "😡"],
+      ["feelings", "害怕", "😨"], ["feelings", "高興", "😄"]
     ];
 
     let currentSentence = [];
     let currentFilter = "all";
 
-    // 語音輸出功能
+    // 語音播放功能
     function speakText(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const msg = new SpeechSynthesisUtterance(text);
         msg.lang = 'zh-TW';
-        msg.rate = 0.75; // 語速調慢，適合理解學習
+        msg.rate = 0.75; // 稍慢語速，適合聽覺理解
         msg.pitch = 1.1;
         window.speechSynthesis.speak(msg);
       }
     }
 
-    // 點擊卡片
     function clickCard(text) {
       speakText(text);
       currentSentence.push(text);
       updateDisplay();
     }
 
-    // 更新頂部文字
     function updateDisplay() {
       const box = document.getElementById("sentence");
       box.innerText = currentSentence.length ? currentSentence.join(" ") : "點擊圖卡...";
@@ -603,16 +375,15 @@
       updateDisplay();
     }
 
-    // 建立分類按鈕區
+    // 渲染頂部分類按鈕
     function initCategoryBar() {
       const bar = document.getElementById("categoryBar");
       bar.innerHTML = "";
-      Object.keys(categories).forEach(key => {
-        const cat = categories[key];
+      categories.forEach(cat => {
         const btn = document.createElement("div");
-        btn.className = `tab-item ${key === currentFilter ? 'active' : ''}`;
+        btn.className = `tab-item ${cat.id === currentFilter ? 'active' : ''}`;
         btn.onclick = () => {
-          currentFilter = key;
+          currentFilter = cat.id;
           initCategoryBar();
           renderGrid();
         };
@@ -625,18 +396,18 @@
     function renderGrid() {
       const grid = document.getElementById("cardGrid");
       grid.innerHTML = "";
-      rawData.forEach(([cat, text, icon, styleClass]) => {
+      cardsData.forEach(([cat, text, icon]) => {
         if (currentFilter === "all" || currentFilter === cat) {
-          const card = document.createElement("div");
-          card.className = `card ${styleClass}`;
-          card.onclick = () => clickCard(text);
-          card.innerHTML = `<div class="card-icon">${icon}</div><div class="card-label">${text}</div>`;
-          grid.appendChild(card);
+          const el = document.createElement("div");
+          el.className = `card ${classMap[cat]}`;
+          el.onclick = () => clickCard(text);
+          el.innerHTML = `<div class="card-icon">${icon}</div><div class="card-label">${text}</div>`;
+          grid.appendChild(el);
         }
       });
     }
 
-    // 初始化
+    // 啟動初始化
     initCategoryBar();
     renderGrid();
   </script>
